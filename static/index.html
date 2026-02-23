@@ -1,4 +1,104 @@
 <!DOCTYPE html>
-<html><head><title>Flight Finder</title></head>
-<body><h1>Flight Finder</h1></body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paris ↔ Istanbul Flights</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>✈ Paris ↔ Istanbul</h1>
+    <p class="subtitle">Direct flights only · Economy · 1 adult</p>
+  </header>
+
+  <main>
+    <section id="search-section">
+      <div class="mode-tabs">
+        <button class="mode-btn active" data-mode="specific">Specific Date</button>
+        <button class="mode-btn" data-mode="weekends">Weekends</button>
+        <button class="mode-btn" data-mode="window">Next N Weeks</button>
+      </div>
+
+      <div id="mode-specific" class="mode-panel">
+        <label>Outbound Friday <input type="date" id="specific-outbound" /></label>
+        <div class="return-toggles">
+          <span>Return:</span>
+          <label><input type="checkbox" id="ret-sunday" checked /> Sunday evening</label>
+          <label><input type="checkbox" id="ret-monday" checked /> Very early Monday</label>
+        </div>
+      </div>
+
+      <div id="mode-weekends" class="mode-panel hidden">
+        <label>From <input type="date" id="weekends-start" /></label>
+        <label>To <input type="date" id="weekends-end" /></label>
+      </div>
+
+      <div id="mode-window" class="mode-panel hidden">
+        <label>Next <input type="number" id="window-weeks" value="4" min="1" max="52" /> weeks</label>
+      </div>
+
+      <div class="time-toggles">
+        <span>Depart on Friday:</span>
+        <label><input type="checkbox" id="dep-early" checked /> Very early (00–09h)</label>
+        <label><input type="checkbox" id="dep-afternoon" checked /> After 4pm (16–24h)</label>
+      </div>
+
+      <button id="search-btn">Search Flights</button>
+      <div id="search-error" class="error hidden"></div>
+    </section>
+
+    <section id="results-section" class="hidden">
+      <div class="results-columns">
+
+        <div class="result-col" id="outbound-col">
+          <h2>Outbound (Paris → Istanbul)</h2>
+          <div class="col-controls">
+            <label>Max price: <span id="out-price-val">any</span>
+              <input type="range" id="out-price-slider" min="0" max="1000" value="1000" />
+            </label>
+            <label>Sort:
+              <select id="out-sort">
+                <option value="price-asc">Cheapest first</option>
+                <option value="price-desc">Most expensive first</option>
+                <option value="time-asc">Earliest departure</option>
+              </select>
+            </label>
+            <div class="view-toggle">
+              <button class="view-btn active" data-col="out" data-view="cards">Cards</button>
+              <button class="view-btn" data-col="out" data-view="table">Table</button>
+            </div>
+          </div>
+          <div id="out-best" class="best-combo hidden"></div>
+          <div id="out-results"></div>
+        </div>
+
+        <div class="result-col" id="return-col">
+          <h2>Return (Istanbul → Paris)</h2>
+          <div class="col-controls">
+            <label>Max price: <span id="ret-price-val">any</span>
+              <input type="range" id="ret-price-slider" min="0" max="1000" value="1000" />
+            </label>
+            <label>Sort:
+              <select id="ret-sort">
+                <option value="price-asc">Cheapest first</option>
+                <option value="price-desc">Most expensive first</option>
+                <option value="time-asc">Earliest departure</option>
+              </select>
+            </label>
+            <div class="view-toggle">
+              <button class="view-btn active" data-col="ret" data-view="cards">Cards</button>
+              <button class="view-btn" data-col="ret" data-view="table">Table</button>
+            </div>
+          </div>
+          <div id="ret-best" class="best-combo hidden"></div>
+          <div id="ret-results"></div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
 </html>
