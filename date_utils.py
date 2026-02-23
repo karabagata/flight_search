@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from typing import List
+from typing import List, Optional
 
 def get_fridays_in_range(start: date, end: date) -> List[date]:
     """Return all Fridays between start and end (inclusive)."""
@@ -11,7 +11,7 @@ def get_fridays_in_range(start: date, end: date) -> List[date]:
         current += timedelta(days=1)
     return fridays
 
-def get_fridays_next_n_weeks(n: int, from_date: date = None) -> List[date]:
+def get_fridays_next_n_weeks(n: int, from_date: Optional[date] = None) -> List[date]:
     """Return all Fridays in the next N weeks from from_date."""
     if from_date is None:
         from_date = date.today()
