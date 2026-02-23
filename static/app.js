@@ -94,16 +94,17 @@ async function search() {
   catch (e) { errEl.textContent = e.message; errEl.classList.remove('hidden'); return; }
 
   btn.disabled = true;
-  btn.textContent = 'Searching…';
+  btn.textContent = `Searching ${requests.length} weekend${requests.length > 1 ? 's' : ''}…`;
 
   try {
+    let done = 0;
     const results = await Promise.all(
       requests.map(r =>
         fetch('/api/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(r),
-        }).then(res => res.json())
+        }).then(res => { done++; btn.textContent = `Searching… ${done}/${requests.length}`; return res.json(); })
       )
     );
 
@@ -142,14 +143,34 @@ function applyFilters(flights, col) {
   const sort = document.getElementById(`${col}-sort`).value;
   const depEarly = document.getElementById('dep-early').checked;
   const depAfternoon = document.getElementById('dep-afternoon').checked;
+  const retSunday = document.getElementById('ret-sunday').checked;
+  const retMonday = document.getElementById('ret-monday').checked;
 
   let filtered = flights.filter(f => {
     if (f.price > maxPrice) return false;
-    const w = getTimeWindow(f.departure_at);
+
+    const dep = new Date(f.departure_at);
+    const hour = dep.getHours();
+    const dow = dep.getDay(); // 0=Sun, 1=Mon
+
     if (col === 'out') {
-      if (!depEarly && w === 'early') return false;
-      if (!depAfternoon && w === 'evening') return false;
+      // Only allow selected time windows; reject mid-day (9h–15h) always
+      const w = getTimeWindow(f.departure_at);
+      if (w === 'other') return false;
+      if (w === 'early' && !depEarly) return false;
+      if (w === 'evening' && !depAfternoon) return false;
     }
+
+    if (col === 'ret') {
+      if (dow === 0) {           // Sunday → only evening (18h+)
+        if (!retSunday) return false;
+        if (hour < 18) return false;
+      } else if (dow === 1) {    // Monday → only very early (00h–05h)
+        if (!retMonday) return false;
+        if (hour >= 6) return false;
+      }
+    }
+
     return true;
   });
 
