@@ -1,4 +1,5 @@
 import os
+import time
 import logging
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -7,6 +8,9 @@ from amadeus import Client, ResponseError
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
+
+CALL_DELAY = 0.12   # seconds between Amadeus API calls (stay under 10 req/s limit)
+RATE_LIMIT_CODE = 38194
 
 load_dotenv()
 
@@ -70,8 +74,9 @@ class FlightSearchClient:
         )
 
     def _search_one_pair(
-        self, origin: str, destination: str, depart_date: date
+        self, origin: str, destination: str, depart_date: date, _retry: bool = True
     ) -> List[FlightOffer]:
+        time.sleep(CALL_DELAY)
         try:
             response = self.amadeus.shopping.flight_offers_search.get(
                 originLocationCode=origin,
@@ -86,9 +91,14 @@ class FlightSearchClient:
             return [FlightOffer.from_raw(r) for r in response.data]
         except ResponseError as e:
             errors = getattr(e.response, 'result', {}).get('errors', [{}])
-            code = errors[0].get('code', '?') if errors else '?'
+            code = errors[0].get('code') if errors else None
             detail = errors[0].get('detail', str(e)) if errors else str(e)
-            logger.warning("Amadeus %s→%s %s: [%s] %s", origin, destination, depart_date, code, detail)
+            if code == RATE_LIMIT_CODE and _retry:
+                logger.warning("Rate limited on %s→%s %s — retrying in 1s", origin, destination, depart_date)
+                time.sleep(1.0)
+                return self._search_one_pair(origin, destination, depart_date, _retry=False)
+            if code != 38189:  # 38189 = no data for this route/date, not worth logging
+                logger.warning("Amadeus %s→%s %s: [%s] %s", origin, destination, depart_date, code, detail)
             return []
 
     def search_outbound(self, depart_date: date) -> List[FlightOffer]:

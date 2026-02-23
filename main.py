@@ -34,14 +34,12 @@ async def search_flights(req: SearchRequest):
 
     loop = asyncio.get_event_loop()
 
-    outbound_task = loop.run_in_executor(None, flight_client.search_outbound, req.outbound_date)
-    return_tasks = [
-        loop.run_in_executor(None, flight_client.search_return, d)
-        for d in req.return_dates
-    ]
-
-    outbound_results, *return_results_nested = await asyncio.gather(outbound_task, *return_tasks)
-    return_results = [offer for sublist in return_results_nested for offer in sublist]
+    # Sequential execution to respect Amadeus rate limits
+    outbound_results = await loop.run_in_executor(None, flight_client.search_outbound, req.outbound_date)
+    return_results = []
+    for d in req.return_dates:
+        results = await loop.run_in_executor(None, flight_client.search_return, d)
+        return_results.extend(results)
 
     return {
         "outbound": [o.to_dict() for o in outbound_results],
