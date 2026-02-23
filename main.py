@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -6,6 +7,8 @@ from typing import List
 from datetime import date
 import asyncio
 from amadeus_client import FlightSearchClient
+
+logging.basicConfig(level=logging.WARNING, format="%(levelname)s [%(name)s] %(message)s")
 
 app = FastAPI(title="Paris-Istanbul Flight Finder")
 app.mount("/static", StaticFiles(directory="static"), name="static")

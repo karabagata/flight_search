@@ -1,9 +1,12 @@
 import os
+import logging
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import List, Optional
 from amadeus import Client, ResponseError
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -81,7 +84,11 @@ class FlightSearchClient:
                 max=10,
             )
             return [FlightOffer.from_raw(r) for r in response.data]
-        except ResponseError:
+        except ResponseError as e:
+            errors = getattr(e.response, 'result', {}).get('errors', [{}])
+            code = errors[0].get('code', '?') if errors else '?'
+            detail = errors[0].get('detail', str(e)) if errors else str(e)
+            logger.warning("Amadeus %s→%s %s: [%s] %s", origin, destination, depart_date, code, detail)
             return []
 
     def search_outbound(self, depart_date: date) -> List[FlightOffer]:
