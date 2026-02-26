@@ -127,10 +127,11 @@ document.getElementById('search-btn').addEventListener('click', search);
 
 // ── Airline name lookup ────────────────────────────────────────
 const AIRLINES = {
-  TK: 'Turkish Airlines', PC: 'Pegasus', TO: 'Transavia',
-  AF: 'Air France',       VY: 'Vueling',  FR: 'Ryanair',
-  U2: 'easyJet',          W6: 'Wizz Air', HV: 'Transavia NL',
-  XK: 'Air Corsica',      AH: 'Air Algérie',
+  TK: 'Turkish Airlines', PC: 'Pegasus',      TO: 'Transavia',
+  AF: 'Air France',       VY: 'Vueling',      FR: 'Ryanair',
+  U2: 'easyJet',          W6: 'Wizz Air',     HV: 'Transavia NL',
+  XK: 'Air Corsica',      AH: 'Air Algérie',  VF: 'Volotea',
+  BJ: 'Nouvelair',        TB: 'TUI fly',      SN: 'Brussels Airlines',
 };
 function airlineName(code) { return AIRLINES[code] || code; }
 
