@@ -127,6 +127,7 @@ header .subtitle { color: #94a3b8; margin-top: .3rem; }
 .flight-card.early { border-left: 3px solid #60a5fa; }
 .flight-card.evening { border-left: 3px solid #fb923c; }
 
+.flight-card .card-date { font-size: .75rem; color: #64748b; margin-bottom: .2rem; }
 .flight-card .times { font-size: 1.1rem; font-weight: 600; }
 .flight-card .route { font-size: .8rem; color: #64748b; }
 .flight-card .info { font-size: .8rem; color: #94a3b8; }

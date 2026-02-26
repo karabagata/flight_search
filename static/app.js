@@ -125,6 +125,15 @@ async function search() {
 
 document.getElementById('search-btn').addEventListener('click', search);
 
+// ── Airline name lookup ────────────────────────────────────────
+const AIRLINES = {
+  TK: 'Turkish Airlines', PC: 'Pegasus', TO: 'Transavia',
+  AF: 'Air France',       VY: 'Vueling',  FR: 'Ryanair',
+  U2: 'easyJet',          W6: 'Wizz Air', HV: 'Transavia NL',
+  XK: 'Air Corsica',      AH: 'Air Algérie',
+};
+function airlineName(code) { return AIRLINES[code] || code; }
+
 // ── Time window classification ─────────────────────────────────
 function getTimeWindow(isoString) {
   const hour = new Date(isoString).getHours();
@@ -198,11 +207,13 @@ function renderCards(flights, containerId) {
     const arr = new Date(f.arrival_at);
     const w = getTimeWindow(f.departure_at);
     const fmt = t => t.toTimeString().slice(0, 5);
+    const dateStr = dep.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
     return `<div class="flight-card ${w}">
       <div>
+        <div class="card-date">${dateStr}</div>
         <div class="times">${fmt(dep)} → ${fmt(arr)}</div>
         <div class="route">${f.origin} → ${f.destination}</div>
-        <div class="info">${f.carrier}${f.flight_number} · ${formatDuration(f.duration)} ${timeLabel(w)}</div>
+        <div class="info">${airlineName(f.carrier)} · ${f.carrier}${f.flight_number} · ${formatDuration(f.duration)} ${timeLabel(w)}</div>
       </div>
       <div class="price">€${f.price.toFixed(0)}</div>
     </div>`;
@@ -224,7 +235,7 @@ function renderTable(flights, containerId) {
       <td>${fmt(dep)}</td>
       <td>${fmt(arr)}</td>
       <td>${f.origin}→${f.destination}</td>
-      <td>${f.carrier}${f.flight_number}</td>
+      <td>${airlineName(f.carrier)} ${f.carrier}${f.flight_number}</td>
       <td>${formatDuration(f.duration)}</td>
       <td class="price-cell">€${f.price.toFixed(0)}</td>
     </tr>`;
