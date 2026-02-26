@@ -38,3 +38,15 @@ def test_search_returns_list(monkeypatch):
     results = client._search_one_pair("CDG", "IST", date(2026, 3, 6))
     assert len(results) == 1
     assert results[0].price == 150.0
+
+
+def test_search_serializes_nonstop_as_lowercase_boolean_string():
+    client = FlightSearchClient.__new__(FlightSearchClient)
+    mock_amadeus = MagicMock()
+    mock_amadeus.shopping.flight_offers_search.get.return_value = MagicMock(data=[])
+    client.amadeus = mock_amadeus
+
+    client._search_one_pair("CDG", "IST", date(2026, 3, 6))
+
+    kwargs = mock_amadeus.shopping.flight_offers_search.get.call_args.kwargs
+    assert kwargs["nonStop"] == "true"

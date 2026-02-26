@@ -17,6 +17,11 @@ load_dotenv()
 PARIS_AIRPORTS = ["CDG", "ORY"]
 ISTANBUL_AIRPORTS = ["IST", "SAW"]
 
+
+def _amadeus_bool(value: bool) -> str:
+    """Serialize booleans as lowercase strings for query params."""
+    return "true" if value else "false"
+
 @dataclass
 class FlightOffer:
     origin: str
@@ -77,13 +82,14 @@ class FlightSearchClient:
         self, origin: str, destination: str, depart_date: date, _retry: bool = True
     ) -> List[FlightOffer]:
         time.sleep(CALL_DELAY)
+        non_stop = True
         try:
             response = self.amadeus.shopping.flight_offers_search.get(
                 originLocationCode=origin,
                 destinationLocationCode=destination,
                 departureDate=depart_date.isoformat(),
                 adults=1,
-                nonStop=True,
+                nonStop=_amadeus_bool(non_stop),
                 travelClass="ECONOMY",
                 currencyCode="EUR",
                 max=10,
